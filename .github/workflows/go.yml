@@ -4,6 +4,20 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # 允许手工触发工作流
+    inputs:
+      os:
+        description: 'OS'
+        default: 'linux'
+        required: true
+      arch:
+        description: 'Architecture'
+        default: 'arm'
+        required: true
+      output:
+        description: 'build'
+        default: 'tcppc-go-armv7'
+        required: true
 
 jobs:
   build-cli:
@@ -12,9 +26,9 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: linux
-            arch: arm
-            output: "tcppc-go-armv7"
+          - os: ${{ github.event.inputs.os }}
+            arch: ${{ github.event.inputs.arch }}
+            output: ${{ github.event.inputs.output }}
     runs-on: ubuntu-latest
     env:
       CGO_ENABLED: 0
