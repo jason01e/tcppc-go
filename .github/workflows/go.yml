@@ -1,0 +1,54 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/md-irohas/tcppc-go
+    steps:
+      - checkout
+      - run: go get -v -d
+      - run: go build -v
+      - store_artifacts:
+          path: ./tcppc-go
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - tcppc-go
+
+  deploy-to-github-release:
+    docker:
+      - image: circleci/golang:1.11
+    steps:
+      - attach_workspace:
+          at: /tmp/build/
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=$(/tmp/build/tcppc-go -v)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/build/
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+      - deploy-to-github-release:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
