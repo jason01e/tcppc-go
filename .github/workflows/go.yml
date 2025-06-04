@@ -12,7 +12,7 @@ on:
         default: 'arm'
         required: true
       output:
-        description: 'build'
+        description: 'output'
         default: 'tcppc-go-linux-armv7'
         required: true
 
