@@ -1,0 +1,34 @@
+name: Build tcppc-go
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-cli:
+    name: Build cli
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: linux
+            arch: arm
+            output: "tcppc-go-armv7"
+    runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: 0
+      GOOS: ${{ matrix.os }}
+      GOARCH: ${{ matrix.arch }}
+      GOARM: 7
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.11.0
+
+      - name: Build
+        run: go build -v -o output/${{ matrix.output }}
