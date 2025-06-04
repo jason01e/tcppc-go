@@ -20,7 +20,7 @@ jobs:
         include:
           - os: linux
             arch: arm
-            output: tcppc-go-armv7
+            output: tcppc-go-armv7l
     runs-on: ubuntu-latest
     env:
       CGO_ENABLED: 0
